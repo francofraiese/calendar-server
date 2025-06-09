@@ -97,13 +97,17 @@ La API estará lista para recibir peticiones desde el frontend configurado en `F
 
 ```bash
 .src
-├── index.js         # Punto de entrada principal
-├── /routes          # Rutas del proyecto
-├── /controllers     # Controladores con la lógica de negocio
-├── /models          # Modelos de la base de datos
-├── /middlewares     # Middlewares utilizados para optimización del código en el ruteo
-├── /utils           # Funciones utilizadas en el código para ciertos propósitos específicos.
-.env                 # Variables de entorno utilizadas
-.env.example         # Ejemplo de archivo .env
-package.json         # Dependencias y scripts
+├── index.js            # Punto de entrada principal
+├── /database
+│   ├── db.ts           # Conexión a la base de datos para utilizar en el resto del repositorio
+│   └── migrations/     # Subcarpeta de migraciones
+│   └── migrate.ts      # Validador de migraciones
+├── /routes             # Rutas del proyecto
+├── /controllers        # Controladores con la lógica de negocio
+├── /models             # Modelos de la base de datos
+├── /middlewares        # Middlewares utilizados para optimización del código en el ruteo
+├── /utils              # Funciones utilizadas en el código para ciertos propósitos específicos.
+.env                    # Variables de entorno utilizadas
+.env.example            # Ejemplo de archivo .env
+package.json            # Dependencias y scripts
 ```
