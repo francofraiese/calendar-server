@@ -1,10 +1,22 @@
 {
+  "scripts": {
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:new": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create",
+    "migration:gen": "npm run typeorm -- -d ./src/database/db.ts migration:generate",
+    "migration:run": "ts-node src/database/migrate.ts",
+    "migration:revert": "npm run typeorm -- -d ./src/database/db.ts migration:revert",
+    "prestart": "npm run migration:run",
+    "start": "ts-node src/main.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/main.ts"
+  },
   "dependencies": {
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "pg": "^8.16.0"
+    "pg": "^8.16.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.24"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

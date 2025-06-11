@@ -89,25 +89,50 @@ Server up @ http://localhost:3000
 
 La API estará lista para recibir peticiones desde el frontend configurado en `FRONTEND_URL`.
 
----
 
-##Información del repositorio
+## Información del repositorio
 
 ### 📂 Estructura del proyecto
 
 ```bash
 .src
-├── index.js            # Punto de entrada principal
-├── /database
-│   ├── db.ts           # Conexión a la base de datos para utilizar en el resto del repositorio
-│   └── migrations/     # Subcarpeta de migraciones
-│   └── migrate.ts      # Validador de migraciones
-├── /routes             # Rutas del proyecto
-├── /controllers        # Controladores con la lógica de negocio
-├── /models             # Modelos de la base de datos
+├── /controllers        # Controladores con la lógica de los endpoints
+├── /database           # Archivos y conexión a la BBDD
+│   ├── db.ts           # Configuración de TypeORM y conexión a la base de datos
+│   ├── migrate.ts      # Validador de migraciones previo a compilación
+│   └── /entities       # Entidades de la BBDD
+│   └── /migrations     # Migraciones de la BBDD
 ├── /middlewares        # Middlewares utilizados para optimización del código en el ruteo
+├── /routes             # Rutas del proyecto
 ├── /utils              # Funciones utilizadas en el código para ciertos propósitos específicos.
+├── app.ts              # Configuración de Express y middlewares globales
+├── main.ts             # Archivo principal para la ejecución del servidor
 .env                    # Variables de entorno utilizadas
-.env.example            # Ejemplo de archivo .env
-package.json            # Dependencias y scripts
+.env.example            # Ejemplo de archivo .env para referencia
+package.json            # Dependencias y scripts del proyecto
+tsconfig.json           # Configuración del compilador TypeScript
 ```
+
+## Migraciones
+
+### Correr migraciones
+
+El proyecto corre por si solo en cada compilación las validaciones de migraciones necesarias, pero en caso de necesitar correrlo manualmente es el siguiente:
+
+```bash
+npm run migration:run
+```
+
+Este comando mostrará en consola en mensaje de migración satisfactoria o, de haberlo, mostrará el error que hubo al corrar una determinada migración lo cual cancelará las demás migraciones.
+
+### Crear migraciones
+
+De necesitar crear una nueva migracion para añadir, modificar o eliminar tablas, columnas o relaciones, pueden crearlas corriendo el siguiente comando:
+
+```bash
+npm run migration:new src/database/migrations/nombre-descriptivo-de-la-migración
+```
+
+Esto nos dará un archivo base de migración, con nombre en base al timestamp de la hora de la creación del archivo seguido del nombre seleccionado. 
+
+Dentro del archivo contaremos con 2 funciones (up y down) las cuales deberán tener la información a modificar o agregar y las acciones necesarias para revertir ese cambio, respectivamente.
