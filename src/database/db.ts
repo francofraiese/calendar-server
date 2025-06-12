@@ -1,14 +1,14 @@
-import { DataSource } from 'typeorm';
-import { User } from './entities/User';
-import { Session } from './entities/Session';
-import { Event } from './entities/Event';
-import 'reflect-metadata';
-import * as dotenv from 'dotenv';
+import { DataSource } from "typeorm";
+import { User } from "./entities/User.entity";
+import { Session } from "./entities/Session.entity";
+import { Event } from "./entities/Event.entity";
+import "reflect-metadata";
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
 export const database = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USER,
@@ -17,5 +17,5 @@ export const database = new DataSource({
   synchronize: false,
   logging: false,
   entities: [User, Session, Event],
-  migrations: ['src/database/migrations/*.ts'],
+  migrations: ["src/database/migrations/*.ts"],
 });
