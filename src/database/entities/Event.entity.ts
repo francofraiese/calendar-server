@@ -23,6 +23,9 @@ export class Event {
   @Column()
   event_date!: Date;
 
+  @Column()
+  end_date!: Date;
+
   @Column({ default: false })
   is_deleted!: boolean;
 
