@@ -4,7 +4,12 @@ import { CreateEventServiceDto, UpdateEventServiceDto } from "@dtos/event";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user!;
+    const userId = req.user;
+
+    if (!userId) {
+      res.status(401).json({ message: "No user id provided" });
+      return;
+    }
 
     const body: CreateEventServiceDto = { ...req.body, userId };
 
@@ -33,14 +38,14 @@ export const softDelete = async (
   res: Response
 ): Promise<void> => {
   try {
-    const id = req.user;
+    const id = req.params.id;
 
     if (!id) {
       res.status(401).json({ message: "No user id provided" });
       return;
     }
 
-    const event = await eventService.softDelete(id);
+    const event = await eventService.softDelete(id, req.user!);
 
     res.status(200).json(event);
   } catch (err) {
@@ -50,11 +55,18 @@ export const softDelete = async (
 
 export const getMonth = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user!;
+    const userId = req.user;
+
+    if (!userId) {
+      res.status(401).json({ message: "No user id provided" });
+      return;
+    }
 
     const now = new Date();
-    const month = req.query.month ? Number(req.query.month) : now.getFullYear();
-    const year = req.query.year ? Number(req.query.year) - 1 : now.getMonth();
+    const month = req.query.month
+      ? Number(req.query.month) - 1
+      : now.getMonth();
+    const year = req.query.year ? Number(req.query.year) : now.getFullYear();
 
     const events = await eventService.getMonth({ userId, month, year });
 
@@ -66,7 +78,12 @@ export const getMonth = async (req: Request, res: Response): Promise<void> => {
 
 export const getWeek = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user!;
+    const userId = req.user;
+
+    if (!userId) {
+      res.status(401).json({ message: "No user id provided" });
+      return;
+    }
     const events = await eventService.getWeek(userId);
 
     res.status(200).json(events);
@@ -77,14 +94,15 @@ export const getWeek = async (req: Request, res: Response): Promise<void> => {
 
 export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.user;
+    const id = req.params.id;
+    const userId = req.user;
 
-    if (!id) {
+    if (!userId) {
       res.status(401).json({ message: "No user id provided" });
       return;
     }
 
-    const event = await eventService.getById(id);
+    const event = await eventService.getById(id, userId);
 
     res.status(200).json(event);
   } catch (err) {

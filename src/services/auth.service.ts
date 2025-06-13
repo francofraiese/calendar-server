@@ -1,61 +1,47 @@
-import { Request, Response } from "express";
 import { Session, User } from "@database/entities";
 import { database } from "@database/db";
 import { comparePasswords, hashPassword } from "@utils/bcrypt";
 import { generateToken } from "@utils/jwt";
 import { isValidTimezone } from "@utils/timezone";
+import { RegisterDto } from "@dtos/auth";
+import { LoginDto } from "@dtos/auth/login.dto";
 
 const userRepo = database.getRepository(User);
 const sessionRepo = database.getRepository(Session);
 
-export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email, password, timezone } = req.body;
+export const register = async ({ email, password, timezone }: RegisterDto) => {
+  const emailInUse = await userRepo.findOneBy({ email });
 
-    const emailInUse = await userRepo.findOneBy({ email });
-
-    if (emailInUse) {
-      res.status(400).json({ message: "Email already in use." });
-      return;
-    }
-
-    const validTimezone = isValidTimezone(timezone);
-
-    if (!validTimezone) {
-      res.status(400).json({ message: "Timezone not valid." });
-      return;
-    }
-
-    const hashed = await hashPassword(password);
-
-    const user = userRepo.create({
-      email,
-      password: hashed,
-      user_timezone: timezone,
-    });
-
-    await userRepo.save(user);
-
-    res.status(201).json({ message: "User successfully registered." });
-  } catch (e) {
-    const err = e as Error;
-    res.status(400).json({ message: err.message });
+  if (emailInUse) {
+    throw new Error("Email already in use.");
   }
+
+  if (!isValidTimezone(timezone)) {
+    throw new Error("Timezone not valid.");
+  }
+
+  const hashed = await hashPassword(password);
+
+  const user = userRepo.create({
+    email,
+    password: hashed,
+    user_timezone: timezone,
+  });
+
+  await userRepo.save(user);
+
+  return { message: "User successfully registered." };
 };
 
-export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
-
+export const login = async ({ email, password }: LoginDto) => {
   const user = await userRepo.findOneBy({ email });
   if (!user) {
-    res.status(401).json({ message: "Credenciales inválidas" });
-    return;
+    throw new Error("Credenciales inválidas");
   }
 
   const valid = await comparePasswords(password, user.password);
   if (!valid) {
-    res.status(401).json({ message: "Credenciales inválidas" });
-    return;
+    throw new Error("Credenciales inválidas");
   }
 
   const token = generateToken(user.id);
@@ -70,5 +56,5 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   await sessionRepo.save(session);
 
-  res.json({ token });
+  return { token };
 };

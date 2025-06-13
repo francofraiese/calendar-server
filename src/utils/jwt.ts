@@ -1,6 +1,5 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import configuration from "../config";
-import { JwtPayload } from "../types/jwt-payload";
 
 const { secret, expiresIn } = configuration().jwt;
 
@@ -12,6 +11,6 @@ export const generateToken = (userId: string): string => {
   return jwt.sign({ userId }, secret, { expiresIn });
 };
 
-export const verifyToken = (token: string) => {
+export const verifyToken = (token: string): JwtPayload => {
   return jwt.verify(token, secret) as JwtPayload;
 };

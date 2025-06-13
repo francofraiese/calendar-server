@@ -24,8 +24,8 @@ export const create = async (payload: CreateEventServiceDto) => {
     user,
     name,
     description,
-    event_date: toUTC(eventDate, user.user_timezone),
-    end_date: toUTC(endDate, user.user_timezone),
+    event_date: toUTC(new Date(eventDate), user.user_timezone),
+    end_date: toUTC(new Date(endDate), user.user_timezone),
     is_deleted: false,
   });
 
@@ -46,18 +46,21 @@ export const update = async (payload: UpdateEventServiceDto) => {
     name: name ?? event.name,
     description: description ?? event.description,
     event_date: eventDate
-      ? toUTC(eventDate, event.user.user_timezone)
+      ? toUTC(new Date(eventDate), event.user.user_timezone)
       : event.event_date,
     end_date: endDate
-      ? toUTC(endDate, event.user.user_timezone)
+      ? toUTC(new Date(endDate), event.user.user_timezone)
       : event.end_date,
   });
 
   return await eventRepo.save({ ...event });
 };
 
-export const softDelete = async (id: string) => {
-  const event = await eventRepo.findOne({ where: { id }, relations: ["user"] });
+export const softDelete = async (id: string, userId: string) => {
+  const event = await eventRepo.findOne({
+    where: { id, user: { id: userId } },
+    relations: ["user"],
+  });
 
   if (!event) throw new Error("Event not found.");
 
@@ -97,8 +100,11 @@ export const getWeek = async (userId: string) => {
   });
 };
 
-export const getById = async (id: string) => {
-  const event = await eventRepo.findOneBy({ id, is_deleted: false });
+export const getById = async (id: string, userId: string) => {
+  const event = await eventRepo.findOne({
+    where: { id, user: { id: userId }, is_deleted: false },
+    relations: ["user"],
+  });
 
   if (!event) throw new Error("Event not found.");
 

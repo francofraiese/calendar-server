@@ -13,7 +13,7 @@ export const authMiddleware = async (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ message: "Token no proporcionado" });
+    res.status(401).json({ message: "Token not provided" });
     return;
   }
 
